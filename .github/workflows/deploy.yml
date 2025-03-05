@@ -1,0 +1,48 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - test  # El workflow se ejecutará cuando haya un push en la rama test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Usaremos un entorno Ubuntu para ejecutar las acciones
+
+    steps:
+      # Paso 1: Hacer checkout del código del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Paso 2: Configurar la clave SSH para EC2
+      - name: Set up SSH with Deploy Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/github-action-key  # La clave SSH privada debe estar en los secretos de GitHub
+          chmod 600 ~/.ssh/github-action-key  # Cambiar permisos para mayor seguridad
+          echo "Host github.com" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/github-action-key" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config  # Desactivar verificación de host
+          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+
+      # Paso 3: Agregar EC2 a los known hosts
+      - name: Add EC2 host to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts  # Añadir EC2 a known_hosts para evitar advertencias de SSH
+
+      # Paso 4: Desplegar en EC2 vía SSH
+      - name: Deploy to EC2 via SSH
+        run: |
+          ssh -i ~/.ssh/github-action-key ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+            # Navegar a la carpeta del proyecto en EC2
+            cd /home/ec2-user/interface-service
+
+            # Obtener los últimos cambios desde la rama 'test'
+            git pull origin test
+
+            # Levantar los contenedores con Docker Compose
+            docker-compose up -d --build  # Reconstruir y levantar contenedores
+
+            # Opcional: Verificar que los contenedores están funcionando
+            docker ps
+          EOF

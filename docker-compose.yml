@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    image: node:14  # Utiliza la imagen oficial de Node.js
+    container_name: interface-service
+    working_dir: /usr/src/app
+    volumes:
+      - ./public:/usr/src/app/public  # Monta los archivos estáticos (html, css, imágenes) en el contenedor
+      - ./routes:/usr/src/app/routes  # Monta las rutas del proyecto
+      - ./server.js:/usr/src/app/server.js  # Monta el archivo de servidor principal
+      - ./package.json:/usr/src/app/package.json  # Monta el archivo de dependencias
+    ports:
+      - "8080:8080"  # El puerto del contenedor estará mapeado al puerto 8080 de tu máquina
+    command: >
+      sh -c "npm install && node server.js"  # Instala las dependencias y ejecuta el servidor
+    networks:
+      - app-network
+    environment:
+      NODE_ENV: production  # Define el entorno de producción (puedes cambiarlo si lo necesitas)
+
+  # Puedes agregar más servicios si es necesario, como bases de datos o servicios adicionales.
+
+networks:
+  app-network:
+    driver: bridge  # Red predeterminada para los servicios
