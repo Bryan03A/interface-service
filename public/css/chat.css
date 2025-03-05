@@ -1,0 +1,190 @@
+/* Estilo general para la página */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contenedor principal del chat */
+.chat-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 100%;
+    padding: 25px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Estilo del encabezado */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Estilo para los formularios */
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #4CAF50;
+    background-color: #fff;
+}
+
+/* Estilo del botón */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Mensajes de error */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Ocultar elementos */
+.hidden {
+    display: none;
+}
+
+/* Estilos del área de chat */
+#chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#chat-with {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Área de mensajes */
+#messages {
+    flex-grow: 1;
+    padding: 15px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+/* Estilos para los mensajes */
+.message {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.sent {
+    background-color: #e1f7d5;
+    align-self: flex-end;
+    border-top-right-radius: 2px;
+}
+
+.received {
+    background-color: #f1f1f1;
+    align-self: flex-start;
+    border-top-left-radius: 2px;
+}
+
+/* Estilo para el campo de mensaje */
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#messageInput {
+    width: 80%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+}
+
+.input-container button {
+    width: 15%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+/* Ajuste para dispositivos móviles */
+@media (max-width: 480px) {
+    .chat-container {
+        width: 100%;
+        padding: 15px;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+    }
+
+    button {
+        padding: 12px;
+    }
+
+    .input-container button {
+        padding: 12px;
+    }
+}
+
+/* Ocultar el campo "Tu Nombre" si ya está autocompletado */
+#username:disabled {
+    background-color: #f9f9f9;
+    cursor: not-allowed;
+}
+
+/* Estilos adicionales para el chat */
+input[type="text"]:focus, button:focus {
+    outline: none;
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat en Tiempo Real</title>
+    <link rel="stylesheet" href="css/chat.css">
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chat en Tiempo Real</h2>
+
+        <!-- Formulario para ingresar los usuarios -->
+        <div id="user-form">
+            <label for="username" class="hidden">Tu Nombre:</label>
+            <input type="text" id="username" class="hidden" placeholder="Ej. Juan" required>
+
+            <label for="recipient">Nombre del Destinatario:</label>
+            <input type="text" id="recipient" placeholder="Ej. María" required>
+
+            <button id="start-chat-btn">Iniciar Chat</button>
+
+            <div id="error-message" class="error-message hidden"></div>
+        </div>
+
+        <!-- Área del chat -->
+        <div id="chat-area" class="hidden">
+            <h3 id="chat-with"></h3> <!-- Mostrar con quién estás chateando -->
+            <div id="messages"></div>
+
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Escribe un mensaje...">
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socket;
+        let username;
+        let recipient;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const storedUsername = localStorage.getItem('username');
+
+            if (token && storedUsername) {
+                document.getElementById("username").value = storedUsername;
+                document.getElementById("username").disabled = true;
+            }
+        });
+
+        document.getElementById("start-chat-btn").addEventListener("click", connectWebSocket);
+
+        function connectWebSocket(event) {
+            event.preventDefault();
+
+            username = document.getElementById("username").value.trim();
+            recipient = document.getElementById("recipient").value.trim();
+
+            if (!username || !recipient) {
+                alert("Por favor, ingresa tu nombre y el del destinatario.");
+                return;
+            }
+
+            document.getElementById("messages").innerHTML = '';
+
+            checkUserExists(username, recipient)
+                .then((recipientData) => {
+                    if (!recipientData) {
+                        document.getElementById("error-message").innerText = "Uno de los usuarios no existe.";
+                        document.getElementById("error-message").classList.remove("hidden");
+                        return;
+                    }
+
+                    document.getElementById("error-message").classList.add("hidden");
+
+                    // Muestra con quién estás chateando y su última conexión
+                    document.getElementById("chat-with").innerText = 
+                        `Estás chateando con: ${recipient}\nÚltima conexión: ${recipientData.lastConnection}`;
+
+                    socket = new WebSocket(`ws://localhost:5010/ws/${username}/${recipient}`);
+
+                    socket.onopen = () => {
+                        console.log("Conectado al WebSocket");
+                        document.getElementById("user-form").classList.add("");
+                        document.getElementById("chat-area").classList.remove("hidden");
+                    };
+
+                    socket.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        displayMessage(data.sender, data.text);
+                    };
+
+                    socket.onclose = () => {
+                        console.log("Desconectado del WebSocket");
+                    };
+                })
+                .catch((err) => {
+                    console.error("Error al verificar usuarios:", err);
+                });
+        }
+
+        function checkUserExists(username, recipient) {
+            return new Promise((resolve, reject) => {
+                fetch(`http://localhost:5020/last-connection?username=${recipient}`)
+                    .then(response => {
+                        if (response.status === 404) return null;
+                        if (!response.ok) throw new Error("Error al obtener la última conexión");
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.userId) {
+                            return resolve(data);
+                        } else {
+                            return resolve(null);
+                        }
+                    })
+                    .catch(err => reject(err));
+            });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            const msgData = {
+                type: "new_message",
+                sender: username,
+                recipient: recipient,
+                text: message
+            };
+
+            socket.send(JSON.stringify(msgData));
+            displayMessage(username, message);
+            messageInput.value = "";
+        }
+
+        function displayMessage(sender, message) {
+            const messagesDiv = document.getElementById("messages");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message", sender === username ? "sent" : "received");
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>

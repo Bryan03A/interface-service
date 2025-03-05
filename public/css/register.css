@@ -1,0 +1,217 @@
+/* General Page Styles */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+/* Container for the whole registration form */
+.container {
+    display: flex;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Left Panel (Profile Image Section) */
+.left-panel {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+}
+
+.profile-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    object-fit: cover;
+    display: block;
+    margin: 10px auto;
+}
+
+.left-panel input[type="file"] {
+    margin-top: 10px;
+}
+
+/* Right Panel (Form Section) */
+.right-panel {
+    flex: 1;
+    padding: 20px;
+}
+
+.right-panel h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Form Styles */
+.right-panel form {
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.right-panel input {
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.right-panel button {
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.right-panel button:hover {
+    background-color: #218838;
+}
+
+/* Link Styling */
+.right-panel p {
+    text-align: center;
+}
+
+.right-panel p a {
+    color: #28a745;
+    text-decoration: none;
+}
+
+.right-panel p a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo para el botón de examinar/subir imagen */
+.left-panel input[type="file"] {
+    display: none; /* Ocultamos el botón original de input */
+}
+
+.left-panel label[for="profile_image"] {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.left-panel label[for="profile_image"]:hover {
+    background-color: #0056b3;
+}
+
+/* Barra de navegación */
+.navbar {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* Hace que la barra de navegación se quede fija al llegar al tope */
+    top: 0; /* Se fija en la parte superior */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    width: 100%; /* Asegura que ocupe todo el ancho */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para resaltar la barra */
+}
+
+/* Estilo del logo */
+.navbar .logo a {
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Barra de navegación */
+.navbar {
+    background-color: #333;
+    color: white;
+    padding: 15px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed; /* Barra de navegación siempre fija */
+    top: 0; /* Se coloca en la parte superior */
+    left: 0; /* Se extiende a todo el ancho */
+    right: 0; /* Asegura que no haya espacio por los lados */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    width: 100%; /* Ocupa todo el ancho de la página */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Estilo del logo */
+.navbar .logo a {
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Estilo de los enlaces de navegación */
+.navbar .nav-links ul {
+    display: flex;
+    list-style: none;
+}
+
+.navbar .nav-links ul li {
+    margin-left: 5px;
+}
+
+.navbar .nav-links ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar .nav-links ul li a:hover {
+    background-color: #575757;
+    border-radius: 4px;
+}
+
+/* Para que el contenido no quede tapado por la barra de navegación */
+body {
+    margin-top: 60px; /* Asegura que el contenido no quede debajo de la barra de navegación */
+}
+
+/* Espaciado adicional para las secciones */
+.container {
+    padding: 20px;
+}
+
+/* Footer (Pie de página) */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    position: fixed; /* Pie de página siempre fijo */
+    bottom: 0; /* Se coloca en la parte inferior */
+    left: 0; /* Se extiende a todo el ancho */
+    right: 0; /* Asegura que no haya espacio por los lados */
+    text-align: center;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}
+
+/* Espaciado del contenido para que no quede tapado por el footer */
+body {
+    padding-bottom: 40px; /* Espacio para el pie de página */
+}

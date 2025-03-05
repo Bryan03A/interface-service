@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro con Foto de Perfil</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav>
+        <div class="navbar">
+            <div class="logo">
+                <a href="index.html">3D Model Shop</a>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="catalog.html" class="nav-link">Add</a></li>
+                    <li id="course-status-link"></li>
+                    <li id="login-register-link">
+                        <a href="login.html">Login</a> / <span id="course-status">Course...</span>
+                    </li>
+                    <li id="user-settings" style="display: none;">
+                        <span id="settings-icon">&#9881;</span>
+                        <div id="settings-dropdown" class="dropdown">
+                            <a href="profile.html">Profile</a>
+                            <a href="bought.html">Bought</a>
+                            <a href="#" id="logout-link">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="left-panel">
+            <h3>Foto de Perfil</h3>
+            <img id="profilePreview" class="profile-preview" src="images/default-avatar.png" alt="Vista previa de la imagen">
+            <label for="profile_image">Sube tu Foto de Perfil</label>
+            <input type="file" id="profile_image" accept="image/*" onchange="previewImage(event)">
+        </div>
+        <div class="right-panel">
+            <h2>Registro de Usuario</h2>
+            <form onsubmit="registerUser(event)">
+                <label>Usuario:</label>
+                <input type="text" id="username" required>
+
+                <label>Contraseña:</label>
+                <input type="password" id="password" required>
+
+                <label>Nombre:</label>
+                <input type="text" id="first_name" required>
+
+                <label>Apellido:</label>
+                <input type="text" id="last_name" required>
+
+                <label>DNI:</label>
+                <input type="text" id="dni" required>
+
+                <label>Email:</label>
+                <input type="email" id="email" required>
+
+                <label>Ciudad:</label>
+                <input type="text" id="city" required>
+
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 3D Model Shop. Todos los derechos reservados.</p>
+    </footer>
+    
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                document.getElementById("profilePreview").src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        async function registerUser(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const first_name = document.getElementById("first_name").value;
+            const last_name = document.getElementById("last_name").value;
+            const dni = document.getElementById("dni").value;
+            const email = document.getElementById("email").value;
+            const city = document.getElementById("city").value;
+            const profileImage = document.getElementById("profile_image").files[0];
+
+            const soapRequest = `
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:user="http://example.com/user">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                        <user:RegisterUser>
+                            <user:username>${username}</user:username>
+                            <user:password>${password}</user:password>
+                            <user:first_name>${first_name}</user:first_name>
+                            <user:last_name>${last_name}</user:last_name>
+                            <user:dni>${dni}</user:dni>
+                            <user:email>${email}</user:email>
+                            <user:city>${city}</user:city>
+                        </user:RegisterUser>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+            `;
+
+            try {
+                // Enviar datos al microservicio de usuario
+                const response = await fetch("http://localhost:5002/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "text/xml" },
+                    body: soapRequest
+                });
+
+                const responseText = await response.text();
+                console.log("Respuesta SOAP:", responseText);
+
+                const userIdMatch = responseText.match(/<us:id>(.*?)<\/us:id>/);
+                if (!userIdMatch) {
+                    alert("Error: No se pudo obtener el ID del usuario.");
+                    return;
+                }
+
+                const userId = userIdMatch[1];
+                console.log("Nuevo ID de usuario:", userId);
+
+                // Si no se seleccionó una imagen, se usará la imagen predeterminada
+                const imageToUpload = profileImage || "images/default-avatar.png";  // Usar la imagen predeterminada si no hay imagen seleccionada
+
+                // Subir la imagen (ya sea seleccionada o la predeterminada)
+                const formData = new FormData();
+                
+                // Si no se seleccionó una imagen, se creará un objeto Blob con la imagen predeterminada
+                if (profileImage) {
+                    formData.append("file", profileImage, `${userId}.png`);
+                } else {
+                    const defaultImage = await fetch(imageToUpload);
+                    const defaultImageBlob = await defaultImage.blob();
+                    formData.append("file", defaultImageBlob, `${userId}.png`);
+                }
+
+                const uploadResponse = await fetch("http://localhost:5015/soap/upload_image", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const uploadData = await uploadResponse.json();
+                if (uploadResponse.ok) {
+                    alert("Usuario registrado y foto de perfil subida con éxito.");
+                } else {
+                    alert("Usuario registrado, pero hubo un error al subir la foto.");
+                }
+
+            } catch (error) {
+                console.error("Error en el registro:", error);
+                alert("Hubo un error al registrar el usuario.");
+            }
+        }
+    </script>
+</body>
+</html>

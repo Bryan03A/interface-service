@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de la Orden</title>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <link rel="stylesheet" href="css/status.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="navbar">
+            <div class="logo">
+                <a href="index.html">3D Model Shop</a>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="requests.html" class="nav-link-requests" id="requestsLink">Requests</a></li>
+                    <li><a href="orders.html" class="nav-link-order" id="ordersLink">Orders</a></li>
+                    <li><a href="catalog.html" class="nav-link" id="catalogLink">Add</a></li>
+                    <!-- If logged in, show username and the settings icon, else show login/register -->
+                    <li id="login-register-link" style="display: none;"><a href="login.html">Login</a> / <a href="register.html">Register</a></li>
+                    <li id="user-settings" style="display: none;">
+                        <span id="username"></span> 
+                        <span id="settings-icon">&#9881;</span> <!-- Gear icon -->
+                        <div id="settings-dropdown" class="dropdown">
+                            <a href="profile.html">Profile</a>
+                            <a href="bought.html">Bought</a>
+                            <a href="#" id="logout-link">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Botón para abrir/cerrar el iframe -->
+    <div class="toggle-button" onclick="toggleIframe()">&#8595;</div>
+
+    <!-- Contenedor del iframe -->
+    <div class="iframe-container" id="iframeContainer">
+        <iframe src="http://localhost:8080/chat.html" frameborder="0"></iframe>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 3D Model Shop. All rights reserved.</p>
+    </footer>
+
+    <h1>Estado de la Orden</h1>
+
+    <div id="order-status-container">
+        <p>Cargando estado de la orden...</p>
+    </div>
+
+    <script>
+
+        // Check if the user is logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+
+            const userSettings = document.getElementById('user-settings');
+            const settingsIcon = document.getElementById('settings-icon');
+            const settingsDropdown = document.getElementById('settings-dropdown');
+            const loginRegisterLink = document.getElementById('login-register-link');
+            const logoutLink = document.getElementById('logout-link');
+            
+            if (token && username) {
+                // Show user settings and username if logged in
+                document.getElementById('user-settings').style.display = 'block';
+                document.getElementById('username').innerText = username;
+                document.getElementById('login-register-link').style.display = 'none';
+            } else {
+                // Show login/register links if not logged in
+                document.getElementById('login-register-link').style.display = 'block';
+                document.getElementById('user-settings').style.display = 'none';
+            }
+
+            // Toggle dropdown visibility when clicking the settings icon
+            settingsIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent the event from propagating
+
+                userSettings.classList.toggle('open');
+
+                if (userSettings.classList.contains('open')) {
+                    const rect = settingsIcon.getBoundingClientRect();
+                    const dropdownWidth = settingsDropdown.offsetWidth;
+                    const screenWidth = window.innerWidth;
+
+                    if (rect.left + dropdownWidth > screenWidth) {
+                        settingsDropdown.style.left = `${rect.left - dropdownWidth + settingsIcon.offsetWidth}px`;
+                    } else {
+                        settingsDropdown.style.left = `${rect.left}px`;
+                    }
+
+                    settingsDropdown.style.top = `${rect.bottom + window.scrollY}px`;
+                }
+            });
+
+            // Logout function
+            logoutLink.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                window.location.href = 'index.html'; // Redirect to home after logout
+            });
+
+            const sessionApiUrl = window.config.sessionApiUrl;
+
+            // Session verification logic
+            document.addEventListener('DOMContentLoaded', async function() {
+                const token = localStorage.getItem('token');
+                
+                if (token) {
+                    try {
+                        const response = await fetch(`${sessionApiUrl}/api/sessions/verify`, {
+                            method: 'GET',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            console.log("Session is valid", data);
+                        } else {
+                            alert('Session expired or invalid, please log in again.');
+                            localStorage.removeItem('token');
+                            window.location.href = 'login.html';
+                        }
+                    } catch (error) {
+                        console.error('Error verifying session:', error);
+                    }
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!userSettings.contains(event.target) && !settingsIcon.contains(event.target)) {
+                    userSettings.classList.remove('open');
+                }
+            });
+        });
+
+        // Función para mostrar/ocultar el iframe del chat
+        function toggleIframe() {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const arrowButton = document.querySelector('.toggle-button');
+
+            if (iframeContainer.style.right === '0px') {
+                iframeContainer.style.right = '-400px';
+                arrowButton.innerHTML = '&#8594;';
+            } else {
+                iframeContainer.style.right = '0px';
+                arrowButton.innerHTML = '&#8592;';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert("No se ha encontrado sesión activa. Por favor, inicie sesión.");
+                return;
+            }
+
+            function parseJWT(token) {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            }
+
+            const decodedToken = parseJWT(token);
+            const userId = decodedToken.user_id;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id');
+
+            if (!orderId) {
+                alert("No se ha proporcionado un ID de orden en la URL.");
+                return;
+            }
+
+            const orderStatusContainer = document.getElementById("order-status-container");
+
+            async function fetchOrderStatus(orderId) {
+                try {
+                    const response = await fetch(`http://localhost:5017/orders/${orderId}/status`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    if (!response.ok) throw new Error("Error al obtener estado de la orden");
+                    const orderStatus = await response.json();
+
+                    orderStatusContainer.innerHTML = `
+                        <h2>Orden ${orderId}</h2>
+                        <table>
+                            <tr>
+                                <th>Solicitado</th>
+                                <th>Aceptado</th>
+                                <th>Completado</th>
+                                <th>Pagado</th>
+                                <th>Alerta</th>
+                            </tr>
+                            <tr>
+                                <td>${orderStatus.requested ? '✔️' : '❌'}</td>
+                                <td>${orderStatus.accepted ? '✔️' : '❌'}</td>
+                                <td>${orderStatus.completed ? '✔️' : '❌'}</td>
+                                <td>${orderStatus.paid ? '✔️' : '❌'}</td>
+                                <td>${orderStatus.alert ? '✔️' : '❌'}</td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="updateState(${orderId}, 'requested', true)" ${orderStatus.accepted ? 'disabled' : ''}>Solicitar</button></td>
+                                <td><button onclick="updateState(${orderId}, 'accepted', true)" ${orderStatus.requested ? '' : 'disabled'} ${orderStatus.completed ? 'disabled' : ''}>Aceptar</button></td>
+                                <td><button onclick="updateState(${orderId}, 'completed', true)" ${orderStatus.accepted ? '' : 'disabled'} ${orderStatus.paid ? 'disabled' : ''}>Completar</button></td>
+                                <td><button onclick="updateState(${orderId}, 'paid', true)" ${orderStatus.completed ? '' : 'disabled'} ${orderStatus.alert ? 'disabled' : ''}>Pagar</button></td>
+                                <td><button onclick="updateState(${orderId}, 'alert', true)" ${orderStatus.paid ? 'disabled' : ''}>Alerta</button></td>
+                            </tr>
+                        </table>
+                    `;
+                } catch (error) {
+                    console.error("Error:", error);
+                    orderStatusContainer.innerHTML = "<p>Error al obtener el estado de la orden.</p>";
+                }
+            }
+
+            async function updateState(orderId, stateType, newValue) {
+                const updateData = { user_id: userId, new_value: newValue, state_type: stateType };
+
+                try {
+                    const response = await fetch(`http://localhost:5017/orders/${orderId}/update`, {
+                        method: "PUT",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+
+                    if (!response.ok) throw new Error("Error al actualizar estado");
+
+                    if (stateType === 'paid' && newValue === true) {
+                        const customModelUpdateResponse = await fetch(`http://localhost:5007/customize-model/${orderId}/state`, {
+                            method: "PUT",
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+
+                        if (!customModelUpdateResponse.ok) throw new Error("Error al actualizar estado en custom-service");
+                        alert("Estado actualizado correctamente en ambas plataformas");
+                    } else {
+                        alert("Estado actualizado correctamente");
+                    }
+
+                    fetchOrderStatus(orderId);
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("No se pudo actualizar el estado");
+                }
+            }
+
+            fetchOrderStatus(orderId);
+            window.updateState = updateState;
+        });
+    </script>
+</body>
+</html>

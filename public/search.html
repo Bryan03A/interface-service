@@ -1,0 +1,80 @@
+<body>
+  <h1>Buscador de Modelos 3D</h1>
+
+  <input type="text" id="searchQuery" placeholder="Buscar modelo...">
+  <input type="text" id="creatorFilter" placeholder="Filtrar por creador...">
+  
+  <label for="sortBy">Ordenar por:</label>
+  <select id="sortBy">
+    <option value="name">Nombre</option>
+    <option value="price">Precio</option>
+  </select>
+
+  <label for="order">Orden:</label>
+  <select id="order">
+    <option value="asc">Ascendente</option>
+    <option value="desc">Descendente</option>
+  </select>
+
+  <button onclick="searchModels()">Buscar</button>
+
+  <div id="results"></div>
+
+  <script>
+    async function searchModels() {
+      const query = document.getElementById('searchQuery').value.trim();
+      const creator = document.getElementById('creatorFilter').value.trim();
+      const sortBy = document.getElementById('sortBy').value;
+      const order = document.getElementById('order').value;
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = ''; // Limpiar resultados anteriores
+
+      if (!query && !creator) {
+        resultsContainer.innerHTML = '<p>Por favor, ingrese al menos un criterio de búsqueda.</p>';
+        return;
+      }
+
+      let url = 'http://localhost:5005/search?';
+      if (query) url += `name=${encodeURIComponent(query)}&`;
+      if (creator) url += `created_by=${encodeURIComponent(creator)}&`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error en la búsqueda: ' + response.statusText);
+
+        const data = await response.json();
+
+        if (data.length > 0) {
+          // Aplicar ordenación manual en el frontend (en caso de que MongoDB no la maneje)
+          data.sort((a, b) => {
+            let valueA = a[sortBy] || 0;
+            let valueB = b[sortBy] || 0;
+
+            if (sortBy === "price") {
+              valueA = parseFloat(valueA) || 0;
+              valueB = parseFloat(valueB) || 0;
+            }
+
+            return order === "asc" ? valueA - valueB : valueB - valueA;
+          });
+
+          data.forEach(model => {
+            const div = document.createElement('div');
+            div.classList.add('model-result');
+            div.innerHTML = `
+              <h3>${model.name}</h3>
+              <p>${model.description || 'Sin descripción'}</p>
+              <p><strong>Creado por:</strong> ${model.created_by}</p>
+              <p><strong>Precio:</strong> $${model.price || 'N/A'}</p>
+            `;
+            resultsContainer.appendChild(div);
+          });
+        } else {
+          resultsContainer.innerHTML = '<p>No se encontraron modelos.</p>';
+        }
+      } catch (error) {
+        resultsContainer.innerHTML = `<p>Error al realizar la búsqueda: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Imagen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Subir Imagen</h2>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" accept="image/*" required>
+            <input type="text" id="imageName" placeholder="Nombre de la imagen" required>
+            <button type="submit">Subir Imagen</button>
+        </form>
+
+        <h3>Imágenes Subidas</h3>
+        <div id="imageGallery"></div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById("uploadForm");
+        const imageGallery = document.getElementById("imageGallery");
+
+        // URL de la API
+        const apiUrl = "http://localhost:5015/soap";
+
+        // Función para cargar imágenes almacenadas
+        async function loadImages() {
+            imageGallery.innerHTML = ""; // Limpiar galería
+
+            const response = await fetch(`${apiUrl}/get_image?filename=*`);
+            const data = await response.json();
+
+            if (data.urls) {
+                data.urls.forEach(url => {
+                    const img = document.createElement("img");
+                    img.src = url;
+                    img.alt = "Imagen subida";
+                    imageGallery.appendChild(img);
+                });
+            }
+        }
+
+        // Manejar la subida de imágenes
+        uploadForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById("imageInput");
+            const imageName = document.getElementById("imageName").value;
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Selecciona un archivo.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file, imageName);
+
+            try {
+                const response = await fetch(`${apiUrl}/upload_image`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Imagen subida con éxito.");
+                    loadImages(); // Recargar imágenes
+                } else {
+                    alert("Error: " + data.error);
+                }
+            } catch (error) {
+                alert("Error al subir la imagen.");
+                console.error(error);
+            }
+        });
+
+        // Cargar imágenes al inicio
+        loadImages();
+    </script>
+
+</body>
+</html>
