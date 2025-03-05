@@ -52,5 +52,5 @@ app.get('/chat', (req, res) => {
 
 // Start server
 app.listen(port, '0.0.0.0', () => {
-    console.log(`Graphical interface server running at http://localhost:${port}`);
+    console.log(`Graphical interface server running at http://3.212.132.24:${port}`);
 });

@@ -159,7 +159,7 @@
 
             async function fetchOrders(userId) {
                 try {
-                    const response = await fetch(`http://localhost:5019/orders/user/${userId}`, {
+                    const response = await fetch(`http://34.200.3.211:5019/orders/user/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -217,7 +217,7 @@
             // Función para obtener la imagen por model_id
             async function getImageUrl(modelId) {
                 try {
-                    const imageResponse = await fetch(`http://localhost:5009/image/${modelId}`);
+                    const imageResponse = await fetch(`http://34.200.3.211:5009/image/${modelId}`);
                     if (imageResponse.ok) {
                         return imageResponse.url; // Retornamos la URL de la imagen
                     } else {

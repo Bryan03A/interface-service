@@ -7,11 +7,11 @@ const router = express.Router();
 const upload = multer({ dest: 'uploads/' }); // Se guarda temporalmente en el directorio 'uploads/'
 
 // URL of the catalog-service microservice
-const CATALOG_SERVICE_URL = process.env.CATALOG_SERVICE_URL || 'http://localhost:5003';
+const CATALOG_SERVICE_URL = process.env.CATALOG_SERVICE_URL || 'http://34.200.3.211:5003';
 // URL of the catalog-del-service microservice
 const CATALOG_DEL_SERVICE_URL = process.env.CATALOG_DEL_SERVICE_URL || 'http://localhost:5011';
 // URL del microservicio de imágenes
-const IMAGE_SERVICE_URL = process.env.IMAGE_SERVICE_URL || 'http://localhost:5009';  // Cambia a la URL de tu servicio
+const IMAGE_SERVICE_URL = process.env.IMAGE_SERVICE_URL || 'http://34.200.3.211:5009';  // Cambia a la URL de tu servicio
 
 
 // Helper function to handle requests to the microservice

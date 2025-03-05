@@ -79,7 +79,7 @@
                     document.getElementById("chat-with").innerText = 
                         `Estás chateando con: ${recipient}\nÚltima conexión: ${recipientData.lastConnection}`;
 
-                    socket = new WebSocket(`ws://localhost:5010/ws/${username}/${recipient}`);
+                    socket = new WebSocket(`ws://34.200.3.211:5010/ws/${username}/${recipient}`);
 
                     socket.onopen = () => {
                         console.log("Conectado al WebSocket");
@@ -103,7 +103,7 @@
 
         function checkUserExists(username, recipient) {
             return new Promise((resolve, reject) => {
-                fetch(`http://localhost:5020/last-connection?username=${recipient}`)
+                fetch(`http://34.200.3.211:5020/last-connection?username=${recipient}`)
                     .then(response => {
                         if (response.status === 404) return null;
                         if (!response.ok) throw new Error("Error al obtener la última conexión");
