@@ -50,8 +50,9 @@ app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat.html'));
 });
 
-app.get('/health', (req, res) => {
-    res.status(200).send('Healthy');
+// Ruta para servir la página de health check
+app.get('/health-page', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'health.html'));  // Asegúrate de que health.html esté en la carpeta 'public'
   });
 
 // Start server

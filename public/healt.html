@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Check</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .status {
+      padding: 10px;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+    .healthy {
+      color: green;
+    }
+    .unhealthy {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Health Check</h1>
+  <button id="checkHealthBtn">Check Health</button>
+  <div id="status" class="status"></div>
+
+  <script>
+    // Al hacer click en el botón, realizamos el health check
+    document.getElementById('checkHealthBtn').addEventListener('click', function() {
+      fetch('/health')
+        .then(response => {
+          if (response.status === 200) {
+            document.getElementById('status').innerHTML = 'Service is Healthy';
+            document.getElementById('status').classList.remove('unhealthy');
+            document.getElementById('status').classList.add('healthy');
+          } else {
+            document.getElementById('status').innerHTML = 'Service is Unhealthy';
+            document.getElementById('status').classList.remove('healthy');
+            document.getElementById('status').classList.add('unhealthy');
+          }
+        })
+        .catch(error => {
+          document.getElementById('status').innerHTML = 'Service is Unhealthy';
+          document.getElementById('status').classList.remove('healthy');
+          document.getElementById('status').classList.add('unhealthy');
+        });
+    });
+  </script>
+</body>
+</html>
