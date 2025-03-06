@@ -9,12 +9,12 @@ const config = {
     sessionApiUrl: window.location.hostname === 'localhost' ? 'http://34.200.3.211:5004' : 'http://34.200.3.211:5004',
 
     // catalogApiUrl: Similar to the other URLs, this is for accessing the catalog API, adjusting based on the environment.
-    catalogApiUrl: window.location.hostname === 'localhost' ? 'http://34.200.3.211:5003' : 'http://34.200.3.211:5003',
+    catalogApiUrl: window.location.hostname === 'localhost' ? 'http://34.228.5.25:5003' : 'http://34.228.5.25:5003',
 
     // catalogApiUrl: Similar to the other URLs, this is for accessing the catalog API, adjusting based on the environment.
-    catalogDelApiUrl: window.location.hostname === 'localhost' ? 'http://34.200.3.211:5011' : 'http://34.200.3.211:5011',
+    catalogDelApiUrl: window.location.hostname === 'localhost' ? 'http://34.228.5.25:5011' : 'http://34.228.5.25:5011',
 
-    imageApiUrl: window.location.hostname === 'localhost' ? 'http://34.200.3.211:5009' : 'http://34.200.3.2115009'
+    imageApiUrl: window.location.hostname === 'localhost' ? 'http://34.228.5.25:5009' : 'http://34.228.5.25:5009'
 };
 
 // Expose the config object globally so it can be accessed anywhere in the client-side code

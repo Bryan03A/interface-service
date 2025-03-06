@@ -115,7 +115,7 @@
 
             try {
                 // Enviar datos al microservicio de usuario
-                const response = await fetch("http://localhost:5002/register", {
+                const response = await fetch("http://34.200.3.211:5002/register", {
                     method: "POST",
                     headers: { "Content-Type": "text/xml" },
                     body: soapRequest
@@ -148,7 +148,7 @@
                     formData.append("file", defaultImageBlob, `${userId}.png`);
                 }
 
-                const uploadResponse = await fetch("http://localhost:5015/soap/upload_image", {
+                const uploadResponse = await fetch("http://34.200.3.211:5015/soap/upload_image", {
                     method: "POST",
                     body: formData
                 });

@@ -215,7 +215,7 @@
 
             try {
                 // Hacer la solicitud al catalog-service en el puerto 5003
-                const response = await fetch(`http://34.200.3.211:5003/models/id/${modelId}`);
+                const response = await fetch(`http://34.228.5.25:5003/models/id/${modelId}`);
                 const data = await response.json();
 
                 if (data.model) {
@@ -285,7 +285,7 @@
 
                 try {
                     // Send customization request to custom-service
-                    const response = await fetch('http://localhost:5007/customize-model', {
+                    const response = await fetch('http://34.228.5.25:5007/customize-model', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
