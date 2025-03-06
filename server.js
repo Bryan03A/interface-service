@@ -50,6 +50,10 @@ app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat.html'));
 });
 
+app.get('/health', (req, res) => {
+    res.status(200).send('Healthy');
+  });
+
 // Start server
 app.listen(port, '0.0.0.0', () => {
     console.log(`Graphical interface server running at http://3.212.132.24:${port}`);
